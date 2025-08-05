@@ -7,6 +7,7 @@ import { ShoppingCart, Search, User, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 interface HeaderProps {
   searchTerm: string;
@@ -44,6 +45,8 @@ export const Header: React.FC<HeaderProps> = ({
           </h1>
           
           <div className="flex items-center gap-4">
+            <ThemeToggle />
+            
             {user ? (
               <>
                 <span className="text-sm text-muted-foreground">

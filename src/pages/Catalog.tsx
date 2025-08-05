@@ -2,8 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Product } from '@/contexts/CartContext';
 import { ProductCard } from '@/components/ProductCard';
+import { ProductCardSkeleton } from '@/components/ProductCardSkeleton';
 import { Header } from '@/components/Header';
-import { Skeleton } from '@/components/ui/skeleton';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -76,14 +76,13 @@ export const Catalog: React.FC = () => {
         />
         
         <div className="container mx-auto px-4 py-8">
+          <div className="mb-8">
+            <div className="h-8 bg-gradient-primary rounded-lg mb-4 animate-pulse" />
+            <div className="h-4 bg-muted rounded-md w-1/3 animate-pulse" />
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 12 }).map((_, i) => (
-              <div key={i} className="space-y-4">
-                <Skeleton className="h-48 w-full rounded-lg" />
-                <Skeleton className="h-4 w-3/4" />
-                <Skeleton className="h-4 w-1/2" />
-                <Skeleton className="h-10 w-full" />
-              </div>
+              <ProductCardSkeleton key={i} />
             ))}
           </div>
         </div>
@@ -102,26 +101,38 @@ export const Catalog: React.FC = () => {
       />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="mb-6">
-          <h2 className="text-3xl font-bold mb-2">Catálogo de Produtos</h2>
-          <p className="text-muted-foreground">
-            {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
-            {searchTerm && ` para "${searchTerm}"`}
-            {selectedCategory !== 'all' && ` na categoria "${selectedCategory}"`}
-          </p>
+        <div className="mb-8">
+          <div className="bg-gradient-primary p-8 rounded-2xl text-white mb-6">
+            <h1 className="text-4xl font-bold mb-2">Catálogo de Produtos</h1>
+            <p className="text-white/90 text-lg">
+              Descubra nossos produtos incríveis com qualidade garantida
+            </p>
+          </div>
+          
+          <div className="flex items-center justify-between mb-6">
+            <p className="text-muted-foreground">
+              {filteredProducts.length} produto{filteredProducts.length !== 1 ? 's' : ''} encontrado{filteredProducts.length !== 1 ? 's' : ''}
+              {searchTerm && ` para "${searchTerm}"`}
+              {selectedCategory !== 'all' && ` na categoria "${selectedCategory}"`}
+            </p>
+          </div>
         </div>
         
         {filteredProducts.length === 0 ? (
-          <div className="text-center py-12">
-            <p className="text-xl text-muted-foreground mb-4">
-              Nenhum produto encontrado
+          <div className="text-center py-16">
+            <div className="bg-muted/50 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-6">
+              <ShoppingCart className="w-12 h-12 text-muted-foreground" />
+            </div>
+            <h3 className="text-2xl font-semibold mb-2">Nenhum produto encontrado</h3>
+            <p className="text-muted-foreground mb-6">
+              Tente ajustar seus filtros ou buscar por algo diferente
             </p>
             <Button 
-              variant="outline" 
               onClick={() => {
                 setSearchTerm('');
                 setSelectedCategory('all');
               }}
+              className="bg-gradient-primary"
             >
               Limpar filtros
             </Button>
