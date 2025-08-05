@@ -50,10 +50,10 @@ export const Checkout: React.FC = () => {
     const email = `📧 Email: ${data.email}`;
     
     const products = items.map(item => 
-      `- ${item.product.name} - Qtd: ${item.quantity} - ${formatPrice(item.product.price * item.quantity)}`
+      `- ${item.product.name} - Qtd: ${item.quantity} - R$ ${(item.product.price * item.quantity).toFixed(2).replace('.', ',')}`
     ).join('\n');
     
-    const totalLine = `💰 TOTAL: ${formatPrice(total)}`;
+    const totalLine = `💰 TOTAL: R$ ${total.toFixed(2).replace('.', ',')}`;
     const footer = '---\nPedido via STG Catalog';
     
     return `${header}\n${customer}\n${email}\n📦 PRODUTOS:\n${products}\n${totalLine}\n${footer}`;
