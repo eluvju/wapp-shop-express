@@ -48,7 +48,6 @@ export const Checkout: React.FC = () => {
     const header = '🛒 NOVO PEDIDO - STG CATALOG';
     const customer = `👤 Cliente: ${data.name}`;
     const email = `📧 Email: ${data.email}`;
-    const phone = `📱 Telefone: ${data.phone}`;
     
     const products = items.map(item => 
       `- ${item.product.name} - Qtd: ${item.quantity} - ${formatPrice(item.product.price * item.quantity)}`
@@ -57,7 +56,7 @@ export const Checkout: React.FC = () => {
     const totalLine = `💰 TOTAL: ${formatPrice(total)}`;
     const footer = '---\nPedido via STG Catalog';
     
-    return `${header}\n${customer}\n${email}\n${phone}\n📦 PRODUTOS:\n${products}\n${totalLine}\n${footer}`;
+    return `${header}\n${customer}\n${email}\n📦 PRODUTOS:\n${products}\n${totalLine}\n${footer}`;
   };
 
   const handleSubmit = async (data: CheckoutForm) => {
