@@ -3,9 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Search, User, LogOut } from 'lucide-react';
+import { ShoppingCart, Search, User, LogOut, Heart, Package } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
+import { useWishlist } from '@/contexts/WishlistContext';
 import { useNavigate } from 'react-router-dom';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
@@ -26,6 +27,7 @@ export const Header: React.FC<HeaderProps> = ({
 }) => {
   const { user, signOut } = useAuth();
   const { itemCount } = useCart();
+  const { itemCount: wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -64,21 +66,48 @@ export const Header: React.FC<HeaderProps> = ({
               </Button>
             )}
             
-            <Button 
-              variant="outline" 
-              className="relative"
-              onClick={() => navigate('/cart')}
-            >
-              <ShoppingCart className="w-4 h-4" />
-              {itemCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
-                >
-                  {itemCount}
-                </Badge>
-              )}
-            </Button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <Button 
+                variant="ghost"
+                className="hidden sm:flex"
+                onClick={() => navigate('/orders')}
+              >
+                <Package className="w-4 h-4 mr-2" />
+                Pedidos
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="relative"
+                onClick={() => navigate('/wishlist')}
+              >
+                <Heart className="w-4 h-4" />
+                {wishlistCount > 0 && (
+                  <Badge 
+                    variant="secondary" 
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {wishlistCount}
+                  </Badge>
+                )}
+              </Button>
+
+              <Button 
+                variant="outline" 
+                className="relative"
+                onClick={() => navigate('/cart')}
+              >
+                <ShoppingCart className="w-4 h-4" />
+                {itemCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                  >
+                    {itemCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
           </div>
         </div>
         

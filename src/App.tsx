@@ -19,6 +19,9 @@ import { Checkout } from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import React from "react";
 
+const OrdersPage = React.lazy(() => import('./pages/Orders'));
+const WishlistPage = React.lazy(() => import('./pages/Wishlist'));
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -62,6 +65,8 @@ const App = () => (
                             <Route path="/auth" element={<Auth />} />
                             <Route path="/cart" element={<Cart />} />
                             <Route path="/checkout" element={<Checkout />} />
+                            <Route path="/orders" element={<OrdersPage />} />
+                            <Route path="/wishlist" element={<WishlistPage />} />
                             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                             <Route path="*" element={<NotFound />} />
                           </Routes>

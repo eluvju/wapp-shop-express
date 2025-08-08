@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -7,12 +7,18 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
-import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Trash2, ArrowLeft, Ticket } from 'lucide-react';
+import { useCoupons } from '@/contexts/CouponsContext';
+import { toast } from '@/hooks/use-toast';
 
 export const Cart: React.FC = () => {
   const { items, updateQuantity, removeFromCart, total, itemCount } = useCart();
   const { user } = useAuth();
+  const { validateCoupon } = useCoupons();
   const navigate = useNavigate();
+  const [couponCode, setCouponCode] = useState('');
+  const [discount, setDiscount] = useState(0);
+  const [appliedCode, setAppliedCode] = useState<string | null>(null);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('pt-BR', {
@@ -36,6 +42,20 @@ export const Cart: React.FC = () => {
       return;
     }
     navigate('/checkout');
+  };
+
+  const handleApplyCoupon = async () => {
+    if (!couponCode.trim()) return;
+    const res = await validateCoupon(couponCode, total);
+    if (res.isValid && res.discount) {
+      setDiscount(res.discount);
+      setAppliedCode(couponCode.toUpperCase());
+      toast({ title: 'Cupom aplicado!', description: `Desconto de R$ ${res.discount.toFixed(2)}` });
+    } else {
+      setDiscount(0);
+      setAppliedCode(null);
+      toast({ title: 'Cupom inválido', description: res.error || 'Verifique o código e tente novamente', variant: 'destructive' });
+    }
   };
 
   if (items.length === 0) {
@@ -171,7 +191,7 @@ export const Cart: React.FC = () => {
                 <CardTitle>Resumo do Pedido</CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between text-sm">
                       <span className="text-muted-foreground">
@@ -184,9 +204,32 @@ export const Cart: React.FC = () => {
                 
                 <Separator />
                 
+                <div className="space-y-3">
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Código do cupom"
+                      value={couponCode}
+                      onChange={(e) => setCouponCode(e.target.value)}
+                    />
+                    <Button variant="outline" onClick={handleApplyCoupon}>
+                      <Ticket className="w-4 h-4 mr-2" />
+                      Aplicar
+                    </Button>
+                  </div>
+
+                  {appliedCode && (
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-muted-foreground">Cupom {appliedCode}</span>
+                      <span className="text-green-600 dark:text-green-400">- {formatPrice(discount)}</span>
+                    </div>
+                  )}
+                </div>
+                
+                <Separator />
+                
                 <div className="flex justify-between font-semibold text-lg">
                   <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPrice(Math.max(total - discount, 0))}</span>
                 </div>
                 
                 <Button 
