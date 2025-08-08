@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { CartProvider } from "@/contexts/CartContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -10,6 +10,7 @@ import { AppStateProvider } from "@/contexts/AppStateContext";
 import { WishlistProvider } from "@/contexts/WishlistContext";
 import { OrdersProvider } from "@/contexts/OrdersContext";
 import { CouponsProvider } from "@/contexts/CouponsContext";
+import { ReviewsProvider } from "@/contexts/ReviewsContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import { Catalog } from "./pages/Catalog";
@@ -18,9 +19,29 @@ import { Cart } from "./pages/Cart";
 import { Checkout } from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import React from "react";
+import { AnimatePresence } from "framer-motion";
 
 const OrdersPage = React.lazy(() => import('./pages/Orders'));
 const WishlistPage = React.lazy(() => import('./pages/Wishlist'));
+
+const AnimatedRoutes: React.FC = () => {
+  const location = useLocation();
+  return (
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<Index />} />
+        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/auth" element={<Auth />} />
+        <Route path="/cart" element={<Cart />} />
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/orders" element={<OrdersPage />} />
+        <Route path="/wishlist" element={<WishlistPage />} />
+        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </AnimatePresence>
+  );
+};
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -55,23 +76,15 @@ const App = () => (
                 <WishlistProvider>
                   <OrdersProvider>
                     <CouponsProvider>
-                      <Toaster />
-                      <Sonner />
-                      <BrowserRouter>
-                        <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
-                          <Routes>
-                            <Route path="/" element={<Index />} />
-                            <Route path="/catalog" element={<Catalog />} />
-                            <Route path="/auth" element={<Auth />} />
-                            <Route path="/cart" element={<Cart />} />
-                            <Route path="/checkout" element={<Checkout />} />
-                            <Route path="/orders" element={<OrdersPage />} />
-                            <Route path="/wishlist" element={<WishlistPage />} />
-                            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-                            <Route path="*" element={<NotFound />} />
-                          </Routes>
-                        </React.Suspense>
-                      </BrowserRouter>
+                      <ReviewsProvider>
+                        <Toaster />
+                        <Sonner />
+                        <BrowserRouter>
+                          <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
+                            <AnimatedRoutes />
+                          </React.Suspense>
+                        </BrowserRouter>
+                      </ReviewsProvider>
                     </CouponsProvider>
                   </OrdersProvider>
                 </WishlistProvider>

@@ -15,6 +15,9 @@ import { ShoppingCart, Filter, Grid, List } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
+import { ReviewsList } from '@/components/reviews/ReviewsList';
+import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { useReviews } from '@/contexts/ReviewsContext';
 
 export const Catalog: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -27,6 +30,7 @@ export const Catalog: React.FC = () => {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
+  const { getSummary } = useReviews();
 
   // Debounce search term
   const [debouncedSearchTerm] = useDebounce(searchTerm, 300);
@@ -298,8 +302,12 @@ export const Catalog: React.FC = () => {
                 <div className="space-y-6">
                   {/* Rating */}
                   <div className="flex items-center gap-4">
-                    <ProductRating rating={4.5} reviewCount={127} size="md" />
-                    <span className="text-sm text-muted-foreground">4.5 de 5 estrelas</span>
+                    {selectedProduct && (
+                      <>
+                        <ProductRating rating={getSummary(selectedProduct.id).average} reviewCount={getSummary(selectedProduct.id).count} size="md" />
+                        <span className="text-sm text-muted-foreground">{getSummary(selectedProduct.id).average} de 5 estrelas</span>
+                      </>
+                    )}
                   </div>
                   
                   {/* Price */}
@@ -334,6 +342,15 @@ export const Catalog: React.FC = () => {
                       <li>• Satisfação garantida</li>
                     </ul>
                   </div>
+
+                  {/* Reviews */}
+                  <Separator />
+                  <div className="space-y-6">
+                    <h3 className="font-semibold text-lg">Avaliações</h3>
+                    <ReviewsList productId={selectedProduct.id} />
+                    <ReviewForm productId={selectedProduct.id} />
+                  </div>
+                  <Separator />
 
                   {/* Add to Cart */}
                   <div className="space-y-4 pt-4">
