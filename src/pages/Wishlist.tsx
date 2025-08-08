@@ -59,7 +59,7 @@ export const Wishlist: React.FC = () => {
                 <Heart className="w-10 h-10 text-muted-foreground" />
                 <h2 className="text-xl font-semibold">Sua lista está vazia</h2>
                 <p className="text-muted-foreground">Explore o catálogo e adicione seus produtos favoritos</p>
-                <Button onClick={() => navigate('/catalog')}>Ir para o catálogo</Button>
+                <Button onClick={() => navigate('/')}>Ir para o catálogo</Button>
               </div>
             </CardContent>
           </Card>

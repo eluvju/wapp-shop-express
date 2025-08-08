@@ -12,7 +12,6 @@ import { OrdersProvider } from "@/contexts/OrdersContext";
 import { CouponsProvider } from "@/contexts/CouponsContext";
 import { ReviewsProvider } from "@/contexts/ReviewsContext";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import Index from "./pages/Index";
 import { Catalog } from "./pages/Catalog";
 import { Auth } from "./pages/Auth";
 import { Cart } from "./pages/Cart";
@@ -29,8 +28,7 @@ const AnimatedRoutes: React.FC = () => {
   return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<Index />} />
-        <Route path="/catalog" element={<Catalog />} />
+        <Route path="/" element={<Catalog />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/checkout" element={<Checkout />} />

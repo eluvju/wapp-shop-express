@@ -12,6 +12,8 @@ interface FilterPanelProps {
   onCategoryChange: (category: string) => void;
   priceRange: [number, number];
   onPriceRangeChange: (range: [number, number]) => void;
+  priceMin?: number;
+  priceMax?: number;
   sortBy: string;
   onSortByChange: (sort: string) => void;
   onClearFilters: () => void;
@@ -24,6 +26,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
   onCategoryChange,
   priceRange,
   onPriceRangeChange,
+  priceMin = 0,
+  priceMax = 1000,
   sortBy,
   onSortByChange,
   onClearFilters,
@@ -110,8 +114,8 @@ export const FilterPanel: React.FC<FilterPanelProps> = ({
             <Slider
               value={priceRange}
               onValueChange={(value) => onPriceRangeChange(value as [number, number])}
-              max={1000}
-              min={0}
+              max={priceMax}
+              min={priceMin}
               step={10}
               className="w-full"
             />

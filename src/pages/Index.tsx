@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowRight, ShoppingBag, Star, Truck, Shield, HeartHandshake } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Navigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Header } from '@/components/Header';
 
@@ -35,6 +35,16 @@ const Index = () => {
     { name: "Esportes", image: "/placeholder.svg", count: 15 }
   ];
 
+  // Página preservada apenas para compatibilidade; redireciona para "/"
+  return (
+    <Navigate to="/" replace />
+  );
+};
+
+export default Index;
+
+/*
+  Página antiga mantida abaixo apenas como referência (não utilizada pois fazemos redirect acima):
   return (
     <div className="min-h-screen bg-background">
       <Header
@@ -230,3 +240,4 @@ const Index = () => {
 };
 
 export default Index;
+*/

@@ -1,11 +1,10 @@
 const CACHE_NAME = 'catalogo-v1';
-const urlsToCache = [
+const urlsToCache = Array.from(new Set([
   '/',
-  '/catalog',
   '/auth',
   '/cart',
   '/checkout'
-];
+]));
 
 // Install event - cache resources
 self.addEventListener('install', (event) => {

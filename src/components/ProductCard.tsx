@@ -28,7 +28,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
 
   return (
     <Card 
-      className="group cursor-pointer card-hover overflow-hidden border-0 shadow-soft hover:shadow-large bg-card"
+      className="group cursor-pointer card-hover overflow-hidden border-0 shadow-soft hover:shadow-large bg-card hover:ring-1 ring-primary/20"
       onClick={() => onViewDetails(product)}
     >
       <div className="relative overflow-hidden">
@@ -55,7 +55,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
           {product.description}
         </p>
         <div className="flex items-center justify-between">
-          <div className="text-2xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+          <div className="text-2xl font-bold text-gradient-primary">
             {formatPrice(product.price)}
           </div>
         </div>
@@ -65,7 +65,8 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
         <Button 
           onClick={handleAddToCart}
           disabled={loading}
-          className="w-full bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-soft hover:shadow-medium border-0"
+          variant="ecom"
+          className="w-full"
           size="sm"
         >
           <ShoppingCart className="w-4 h-4 mr-2" />

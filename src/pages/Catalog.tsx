@@ -11,12 +11,14 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
-import { ShoppingCart, Filter, Grid, List } from 'lucide-react';
+import { ShoppingCart, Filter } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { motion } from 'framer-motion';
 import { useDebounce } from 'use-debounce';
 import { ReviewsList } from '@/components/reviews/ReviewsList';
 import { ReviewForm } from '@/components/reviews/ReviewForm';
+import { HeroCarousel } from '@/components/HeroCarousel';
+import { toast } from '@/hooks/use-toast';
 import { useReviews } from '@/contexts/ReviewsContext';
 
 export const Catalog: React.FC = () => {
@@ -26,8 +28,10 @@ export const Catalog: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
+  const [priceMin, setPriceMin] = useState(0);
+  const [priceMax, setPriceMax] = useState(1000);
   const [sortBy, setSortBy] = useState('name');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
+  
   const [showFilters, setShowFilters] = useState(false);
   const { addToCart } = useCart();
   const { getSummary } = useReviews();
@@ -41,15 +45,58 @@ export const Catalog: React.FC = () => {
 
   const loadProducts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .order('name');
+      const pageSize = 1000;
+      let page = 0;
+      let list: Product[] = [];
+      let totalCount: number | null = null;
 
-      if (error) throw error;
-      setProducts(data || []);
+      // Paginação segura para garantir que buscamos todos os registros
+      // Obtém a primeira página com count
+      const first = await supabase
+        .from('products')
+        .select('*', { count: 'exact' })
+        .order('name')
+        .range(page * pageSize, page * pageSize + pageSize - 1);
+
+      if (first.error) throw first.error;
+      list = (first.data as Product[]) || [];
+      totalCount = first.count ?? null;
+
+      // Buscar páginas seguintes, se houver
+      while ((first.count ?? 0) > list.length) {
+        page += 1;
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .order('name')
+          .range(page * pageSize, page * pageSize + pageSize - 1);
+        if (error) throw error;
+        const chunk = (data as Product[]) || [];
+        list = list.concat(chunk);
+        if (chunk.length < pageSize) break;
+      }
+
+      setProducts(list);
+      // Atualiza faixa de preço dinamicamente de acordo com os dados
+      if (list.length > 0) {
+        const prices = list.map(p => p.price);
+        const min = Math.min(...prices);
+        const max = Math.max(...prices);
+        setPriceMin(Math.floor(min));
+        setPriceMax(Math.ceil(max));
+        setPriceRange([Math.floor(min), Math.ceil(max)]);
+      }
+
+      // Se count reportado for maior que itens exibidos, possível RLS/políticas
+      if (totalCount !== null && list.length < totalCount) {
+        toast({
+          title: 'Aviso',
+          description: 'Nem todos os produtos foram retornados. Verifique políticas RLS ou paginação.',
+        });
+      }
     } catch (error) {
       console.error('Error loading products:', error);
+      toast({ title: 'Erro ao carregar produtos', variant: 'destructive' });
     } finally {
       setLoading(false);
     }
@@ -130,7 +177,7 @@ export const Catalog: React.FC = () => {
             <div className="h-8 bg-gradient-primary rounded-lg mb-4 animate-pulse" />
             <div className="h-4 bg-muted rounded-md w-1/3 animate-pulse" />
           </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
             {Array.from({ length: 12 }).map((_, i) => (
               <ProductCardSkeleton key={i} />
             ))}
@@ -156,12 +203,17 @@ export const Catalog: React.FC = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="bg-gradient-primary p-8 rounded-2xl text-white mb-6"
+            className="mb-6"
           >
-            <h1 className="text-4xl font-bold mb-2">Catálogo de Produtos</h1>
-            <p className="text-white/90 text-lg">
-              Descubra nossos produtos incríveis com qualidade garantida
-            </p>
+            <HeroCarousel
+              images={[
+                { url: 'https://images.unsplash.com/photo-1513188732907-5f732b831ca8?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', alt: 'Tênis Nike - Close em ambiente' },
+                { url: 'https://images.unsplash.com/photo-1595900506667-89afeae9d11b?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', alt: 'Tênis Nike - Lifestyle urbano' },
+                { url: 'https://images.unsplash.com/photo-1712160973124-1670154c7867?q=80&w=1600&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D', alt: 'Tênis Nike - Detalhe do produto' },
+              ]}
+              title=""
+              subtitle=""
+            />
           </motion.div>
           
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
@@ -187,22 +239,7 @@ export const Catalog: React.FC = () => {
                 )}
               </Button>
               
-              <div className="hidden sm:flex items-center gap-2">
-                <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('grid')}
-                >
-                  <Grid className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => setViewMode('list')}
-                >
-                  <List className="w-4 h-4" />
-                </Button>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -217,6 +254,8 @@ export const Catalog: React.FC = () => {
                 onCategoryChange={setSelectedCategory}
                 priceRange={priceRange}
                 onPriceRangeChange={setPriceRange}
+                priceMin={priceMin}
+                priceMax={priceMax}
                 sortBy={sortBy}
                 onSortByChange={setSortBy}
                 onClearFilters={handleClearFilters}
@@ -241,19 +280,15 @@ export const Catalog: React.FC = () => {
                 <p className="text-muted-foreground mb-6">
                   Tente ajustar seus filtros ou buscar por algo diferente
                 </p>
-                <Button 
-                  onClick={handleClearFilters}
-                  className="bg-gradient-primary"
-                >
+              <Button 
+                onClick={handleClearFilters}
+                variant="ecom"
+              >
                   Limpar filtros
                 </Button>
               </motion.div>
             ) : (
-              <div className={
-                viewMode === 'grid' 
-                  ? "grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6"
-                  : "space-y-6"
-              }>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredProducts.map((product, index) => (
                   <motion.div
                     key={product.id}
@@ -312,7 +347,7 @@ export const Catalog: React.FC = () => {
                   
                   {/* Price */}
                   <div className="space-y-2">
-                    <div className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+                    <div className="text-3xl font-bold text-gradient-primary">
                       {formatPrice(selectedProduct.price)}
                     </div>
                     <p className="text-sm text-muted-foreground">
@@ -356,7 +391,8 @@ export const Catalog: React.FC = () => {
                   <div className="space-y-4 pt-4">
                     <Button 
                       onClick={() => handleAddToCart(selectedProduct)}
-                      className="w-full bg-gradient-primary hover:opacity-90 transition-all duration-300 shadow-medium hover:shadow-large"
+                      variant="ecom"
+                      className="w-full"
                       size="lg"
                     >
                       <ShoppingCart className="w-5 h-5 mr-2" />

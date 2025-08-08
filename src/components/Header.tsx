@@ -1,9 +1,10 @@
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { SearchAutocomplete } from '@/components/SearchAutocomplete';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ShoppingCart, Search, User, LogOut, Heart, Package } from 'lucide-react';
+import { ShoppingCart, Search, User, LogOut, Heart, Package, BadgePercent, Tag, Store } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCart } from '@/contexts/CartContext';
 import { useWishlist } from '@/contexts/WishlistContext';
@@ -30,13 +31,22 @@ export const Header: React.FC<HeaderProps> = ({
   const { itemCount: wishlistCount } = useWishlist();
   const navigate = useNavigate();
 
+  const handleKeyActivate: React.KeyboardEventHandler<HTMLDivElement> = (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      (e.currentTarget as HTMLDivElement).click();
+      e.preventDefault();
+    }
+  };
+
   const handleSignOut = async () => {
     await signOut();
     navigate('/');
   };
 
+  // Header fixa no fluxo da página (sem retração/retorno no scroll)
+
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className={"w-full border-b header-surface"}>
       <div className="container mx-auto px-4 py-4">
         <div className="flex items-center justify-between mb-4">
           <h1 
@@ -51,79 +61,126 @@ export const Header: React.FC<HeaderProps> = ({
             
             {user ? (
               <>
-                <span className="text-sm text-muted-foreground">
+                <span className="text-sm opacity-90">
                   Olá, {user.user_metadata?.name || user.email}
                 </span>
-                <Button variant="ghost" size="sm" onClick={handleSignOut}>
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Sair
-                </Button>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={handleKeyActivate}
+                      onClick={handleSignOut}
+                      aria-label="Sair"
+                      title="Sair"
+                      className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                    >
+                      <LogOut />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent sideOffset={6}>Sair</TooltipContent>
+                </Tooltip>
               </>
             ) : (
-              <Button variant="outline" onClick={() => navigate('/auth')}>
-                <User className="w-4 h-4 mr-2" />
-                Entrar
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyActivate}
+                    onClick={() => navigate('/auth')}
+                    aria-label="Entrar"
+                    title="Entrar"
+                    className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                  >
+                    <User />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={6}>Entrar</TooltipContent>
+              </Tooltip>
             )}
             
             <div className="flex items-center gap-2 sm:gap-3">
-              <Button 
-                variant="ghost"
-                className="hidden sm:flex"
-                onClick={() => navigate('/orders')}
-              >
-                <Package className="w-4 h-4 mr-2" />
-                Pedidos
-              </Button>
-
-              <Button 
-                variant="outline" 
-                className="relative"
-                onClick={() => navigate('/wishlist')}
-              >
-                <Heart className="w-4 h-4" />
-                {wishlistCount > 0 && (
-                  <Badge 
-                    variant="secondary" 
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyActivate}
+                    onClick={() => navigate('/orders')}
+                    aria-label="Pedidos"
+                    title="Pedidos"
+                    className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
                   >
-                    {wishlistCount}
-                  </Badge>
-                )}
-              </Button>
+                    <Package />
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={6}>Pedidos</TooltipContent>
+              </Tooltip>
 
-              <Button 
-                variant="outline" 
-                className="relative"
-                onClick={() => navigate('/cart')}
-              >
-                <ShoppingCart className="w-4 h-4" />
-                {itemCount > 0 && (
-                  <Badge 
-                    variant="destructive" 
-                    className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyActivate}
+                    className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                    onClick={() => navigate('/wishlist')}
+                    aria-label="Favoritos"
+                    title="Favoritos"
                   >
-                    {itemCount}
-                  </Badge>
-                )}
-              </Button>
+                    <Heart />
+                    {wishlistCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                      >
+                        {wishlistCount}
+                      </Badge>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={6}>Favoritos</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <div 
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={handleKeyActivate}
+                    className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                    onClick={() => navigate('/cart')}
+                    aria-label="Carrinho"
+                    title="Carrinho"
+                  >
+                    <ShoppingCart />
+                    {itemCount > 0 && (
+                      <Badge 
+                        variant="destructive" 
+                        className="absolute -top-2 -right-2 h-5 w-5 rounded-full p-0 flex items-center justify-center text-xs"
+                      >
+                        {itemCount}
+                      </Badge>
+                    )}
+                  </div>
+                </TooltipTrigger>
+                <TooltipContent sideOffset={6}>Carrinho</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>
         
         <div className="flex flex-col sm:flex-row gap-4">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
-            <Input
-              placeholder="Buscar produtos..."
+            <SearchAutocomplete
               value={searchTerm}
-              onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10"
+              onChange={onSearchChange}
             />
           </div>
           
           <Select value={selectedCategory} onValueChange={onCategoryChange}>
-            <SelectTrigger className="w-full sm:w-48">
+            <SelectTrigger className="w-full sm:w-48 bg-background text-foreground border-0 shadow-soft">
               <SelectValue placeholder="Categoria" />
             </SelectTrigger>
             <SelectContent>
@@ -135,6 +192,62 @@ export const Header: React.FC<HeaderProps> = ({
               ))}
             </SelectContent>
           </Select>
+        </div>
+
+        {/* Barra de atalho estilo marketplace (inspirado no Mercado Livre) */}
+          <div className="mt-4 flex items-center gap-2 overflow-x-auto pb-1 [&>div_button]:mx-0.5">
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                role="button"
+                tabIndex={0}
+                onKeyDown={handleKeyActivate}
+                onClick={() => navigate('/')}
+                className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                aria-label="Ofertas"
+                title="Ofertas"
+              >
+                <Tag />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Ofertas</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                role="button"
+                tabIndex={0}
+                onKeyDown={handleKeyActivate}
+                onClick={() => navigate('/')}
+                className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                aria-label="Cupons"
+                title="Cupons"
+              >
+                <BadgePercent />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Cupons</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div
+                role="button"
+                tabIndex={0}
+                onKeyDown={handleKeyActivate}
+                onClick={() => navigate('/')}
+                className="relative grid place-items-center h-9 w-9 sm:h-10 sm:w-10 rounded-lg text-current opacity-95 hover:opacity-100 hover:bg-white/15 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40 transition-all duration-150 active:scale-95 backdrop-blur-sm [&>svg]:size-5 [&>svg]:stroke-[2]"
+                aria-label="Supermercado"
+                title="Supermercado"
+              >
+                <Store />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={6}>Supermercado</TooltipContent>
+          </Tooltip>
+
+          <Badge variant="secondary" className="ml-1 whitespace-nowrap">
+            Frete grátis a partir de R$ 19
+          </Badge>
         </div>
       </div>
     </header>

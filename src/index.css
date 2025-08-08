@@ -41,6 +41,13 @@ All colors MUST be HSL.
     --ring: 221.2 83.2% 53.3%;
 
     --radius: 0.75rem;
+    /* Header blue scale (tons distintos de azul) */
+    --header-blue-1: 221.2 83.2% 60%; /* mais claro */
+    --header-blue-2: 224 76% 54%;     /* médio */
+    --header-blue-3: 228 68% 46%;     /* mais escuro */
+    /* Header surface (usa o primário por padrão) */
+    --header: var(--primary);
+    --header-foreground: var(--primary-foreground);
 
     /* Custom e-commerce colors */
     --success: 142.1 76.2% 36.3%;
@@ -49,8 +56,13 @@ All colors MUST be HSL.
     --warning: 32.5 94.6% 43.7%;
     --warning-foreground: 220.9 39.3% 11%;
 
-    /* Modern gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(221.2 83.2% 53.3%), hsl(221.2 83.2% 63.3%));
+    /* Gradiente principal padronizado (tons de azul) */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(221.2 83.2% 60%) 0%,
+      hsl(221.2 83.2% 53.3%) 50%,
+      hsl(221.2 83.2% 46%) 100%
+    );
     --gradient-secondary: linear-gradient(135deg, hsl(220 14.3% 95.9%), hsl(220 14.3% 90%));
     
     /* Elegant shadows */
@@ -111,8 +123,13 @@ All colors MUST be HSL.
     --warning: 32.5 94.6% 43.7%;
     --warning-foreground: 220.9 39.3% 11%;
 
-    /* Dark gradients */
-    --gradient-primary: linear-gradient(135deg, hsl(221.2 83.2% 53.3%), hsl(221.2 83.2% 43.3%));
+    /* Gradiente principal no dark (tons de azul mais escuros) */
+    --gradient-primary: linear-gradient(
+      135deg,
+      hsl(221.2 83.2% 48%) 0%,
+      hsl(221.2 83.2% 42%) 50%,
+      hsl(221.2 83.2% 36%) 100%
+    );
     --gradient-secondary: linear-gradient(135deg, hsl(215 27.9% 16.9%), hsl(215 27.9% 21.9%));
     
     /* Dark shadows */
@@ -127,6 +144,13 @@ All colors MUST be HSL.
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Header no dark (mantém primário para consistência) */
+    --header: var(--primary);
+    --header-foreground: var(--primary-foreground);
+    /* Header blue scale no dark (mais escuro) */
+    --header-blue-1: 221.2 83.2% 40%;
+    --header-blue-2: 224 76% 36%;
+    --header-blue-3: 228 68% 30%;
   }
 }
 
@@ -199,5 +223,40 @@ All colors MUST be HSL.
 
   .shadow-large {
     box-shadow: var(--shadow-large);
+  }
+
+  /* Gradient text utility para títulos/preços */
+  .text-gradient-primary {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Superfície da Header/Nav com cor do e-commerce */
+  .header-surface {
+    /* Fallback sólido */
+    background-color: hsl(var(--primary));
+    /* Degradê texturizado em tons de azul (reutiliza o mesmo do herói) */
+    background-image:
+      /* leve textura diagonal */
+      repeating-linear-gradient(45deg,
+        hsl(0 0% 100% / 0.035) 0 2px,
+        transparent 2px 6px
+      ),
+      /* brilho suave no canto superior esquerdo */
+      radial-gradient(120% 120% at 0% 0%,
+        hsl(var(--primary) / 0.22) 0%,
+        transparent 60%
+      ),
+      /* nuance fria no canto inferior direito */
+      radial-gradient(120% 120% at 100% 100%,
+        hsl(221.2 83.2% 40% / 0.18) 0%,
+        transparent 60%
+      ),
+      /* gradiente principal unificado */
+      var(--gradient-primary);
+    background-blend-mode: overlay, soft-light, soft-light, normal;
+    color: hsl(var(--header-foreground));
   }
 }
