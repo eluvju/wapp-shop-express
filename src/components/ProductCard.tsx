@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { ShoppingCart } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
+import { formatCurrency } from '@/lib/format';
 
 interface ProductCardProps {
   product: Product;
@@ -19,13 +20,6 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
     await addToCart(product);
   };
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(price);
-  };
-
   return (
     <Card 
       className="group cursor-pointer card-hover overflow-hidden border-0 shadow-soft hover:shadow-large bg-card hover:ring-1 ring-primary/20"
@@ -37,6 +31,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
           alt={product.name}
           className="w-full h-48 object-cover group-hover:scale-110 transition-transform duration-500"
           loading="lazy"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
         <Badge 
@@ -56,7 +51,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product, onViewDetails
         </p>
         <div className="flex items-center justify-between">
           <div className="text-2xl font-bold text-gradient-primary">
-            {formatPrice(product.price)}
+            {formatCurrency(product.price)}
           </div>
         </div>
       </CardContent>

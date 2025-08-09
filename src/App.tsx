@@ -19,6 +19,7 @@ import { Checkout } from "./pages/Checkout";
 import NotFound from "./pages/NotFound";
 import React from "react";
 import { AnimatePresence } from "framer-motion";
+import { GlobalSEO } from "@/components/GlobalSEO";
 
 const OrdersPage = React.lazy(() => import('./pages/Orders'));
 const WishlistPage = React.lazy(() => import('./pages/Wishlist'));
@@ -78,6 +79,7 @@ const App = () => (
                         <Toaster />
                         <Sonner />
                         <BrowserRouter>
+                          <GlobalSEO />
                           <React.Suspense fallback={<div className="min-h-screen flex items-center justify-center">Carregando...</div>}>
                             <AnimatedRoutes />
                           </React.Suspense>

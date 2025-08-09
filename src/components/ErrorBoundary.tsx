@@ -24,6 +24,13 @@ export class ErrorBoundary extends Component<Props, State> {
 
   public componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('ErrorBoundary caught an error:', error, errorInfo);
+    try {
+      // Report to Sentry if available
+      // Import lazily to avoid bundling if not used
+      import('@/monitoring').then(({ Sentry }) => {
+        try { Sentry.captureException?.(error); } catch {}
+      }).catch(() => {});
+    } catch {}
   }
 
   private handleReset = () => {
