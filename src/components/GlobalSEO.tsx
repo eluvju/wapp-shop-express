@@ -54,14 +54,14 @@ export const GlobalSEO = () => {
       }
     };
 
-    let script = document.getElementById('ld-website');
+    let script = document.getElementById('ld-website') as HTMLScriptElement | null;
     if (!script) {
-      script = document.createElement('script');
+      script = document.createElement('script') as HTMLScriptElement;
       script.id = 'ld-website';
       script.type = 'application/ld+json';
       document.head.appendChild(script);
     }
-    script.textContent = JSON.stringify(ld);
+    script!.textContent = JSON.stringify(ld);
 
     // Track page view
     const dl = (window as any).dataLayer;

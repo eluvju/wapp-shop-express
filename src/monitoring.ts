@@ -27,7 +27,7 @@ export function initMonitoring() {
 
   // GA4
   const gaId = getMeta('ga-measurement-id');
-  if (gaId && !window.dataLayer) {
+  if (gaId && !(window as any).dataLayer) {
     (function(w:any,d:any,s:string,l:string,i:string){
       w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});
       const f=d.getElementsByTagName(s)[0], j=d.createElement(s), dl=l!='dataLayer'?'&l='+l:'';
